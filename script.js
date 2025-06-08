@@ -272,6 +272,7 @@ function updateDisplay() {
     const seconds = timerState.timeRemaining % 60;
     const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timerTime').textContent = timeString;
+    document.getElementById('timerTimelabel').textContent = timeString;
 }
 
 function updateProgress() {
