@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tomodoro - Advanced Pomodoro Timer</title>
+    <link
+      rel="manifest"
+      href="data:application/json,{%22name%22:%22Tomodoro%22,%22short_name%22:%22Tomodoro%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23282c34%22,%22theme_color%22:%22%23e74c3c%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23e74c3c'/%3E%3Ctext x='50' y='60' text-anchor='middle' fill='white' font-size='30' font-family='Arial'%3E🍅%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]}"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-theme="default">
+    <div class="app-container">
+      <header class="header">
+        <div class="logo">
+          <span>🍅</span>
+          <span>Tomodoro</span>
+        </div>
+        <div class="controls">
+          <button class="btn" onclick="toggleSettings()">⚙️ Settings</button>
+          <button class="btn btn-primary" id="pipBtn" onclick="togglePIP()">
+            📺 PIP Mode
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div class="timer-section" id="timerSection">
+          <div class="mode-selector">
+            <button
+              class="mode-btn active"
+              onclick="setMode('focus')"
+              data-mode="focus"
+            >
+              Focus
+            </button>
+            <button
+              class="mode-btn"
+              onclick="setMode('shortBreak')"
+              data-mode="shortBreak"
+            >
+              Short Break
+            </button>
+          </div>
+
+          <div class="timer-display">
+            <div class="timer-progress" id="timerProgress"></div>
+            <div class="timer-time" id="timerTime">25:00</div>
+            <div class="timer-label" id="timerLabel">FOCUS</div>
+          </div>
+
+          <div class="timer-controls">
+            <button class="btn" onclick="resetTimer()">⏹️ Reset</button>
+            <button class="play-btn" id="playBtn" onclick="toggleTimer()">
+              ▶️
+            </button>
+            <button class="btn" onclick="skipTimer()">⏭️ Skip</button>
+          </div>
+
+          <div class="spotify-player">
+            <div class="card-title">
+              <span>🎧</span>
+              <span>Spotify Music</span>
+            </div>
+            <div class="spotify-track">
+              <div class="track-info">
+                <div class="track-name" id="trackName">YOUR EYES</div>
+                <div class="track-artist" id="trackArtist">Joey Pecoraro</div>
+              </div>
+              <div class="spotify-controls">
+                <button class="spotify-btn" onclick="prevTrack()">⏮️</button>
+                <button
+                  class="spotify-btn"
+                  onclick="toggleSpotify()"
+                  id="spotifyPlayBtn"
+                >
+                  ▶️
+                </button>
+                <button class="spotify-btn" onclick="nextTrack()">⏭️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="pipModeMessage" class="pip-mode-message hidden">
+          Picture in Picture Mode Active
+        </div>
+
+        <div class="sidebar">
+          <div class="card">
+            <div class="card-title">
+              <span>📋</span>
+              <span>Tasks</span>
+            </div>
+            <input
+              type="text"
+              class="task-input"
+              id="taskInput"
+              placeholder="Add a new task..."
+              onkeypress="handleTaskInput(event)"
+            />
+            <button class="btn btn-success" onclick="addTask()">
+              Add Task
+            </button>
+            <div class="task-list" id="taskList"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>📊</span>
+              <span>Statistics</span>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value" id="completedPomodoros">0</div>
+                <div class="stat-label">Completed</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="totalTime">0h</div>
+                <div class="stat-label">Total Time</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="currentStreak">0</div>
+                <div class="stat-label">Streak</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="todayPomodoros">0</div>
+                <div class="stat-label">Today</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>🎵</span>
+              <span>White Noise</span>
+            </div>
+            <select id="whiteNoiseSelect" onchange="changeWhiteNoise()">
+              <option value="">None</option>
+              <option value="rain">Rain</option>
+              <option value="forest">Forest</option>
+              <option value="ocean">Ocean</option>
+              <option value="coffee">Coffee Shop</option>
+            </select>
+            <div class="volume-control">
+              <span>🔊</span>
+              <input
+                type="range"
+                class="volume-slider"
+                id="volumeSlider"
+                min="0"
+                max="100"
+                value="50"
+                onchange="adjustVolume()"
+              />
+            </div>
+          </div>
+
+          <div class="card hidden" id="settingsCard">
+            <div class="card-title">
+              <span>⚙️</span>
+              <span>Settings</span>
+            </div>
+
+            <div style="margin-bottom: 15px">
+              <label>Focus Duration (minutes):</label>
+              <input
+                type="number"
+                id="focusDuration"
+                value="25"
+                min="1"
+                max="60"
+                onchange="updateSettings()"
+              />
+            </div>
+
+            <div style="margin-bottom: 15px">
+              <label>Short Break (minutes):</label>
+              <input
+                type="number"
+                id="shortBreakDuration"
+                value="5"
+                min="1"
+                max="30"
+                onchange="updateSettings()"
+              />
+            </div>
+
+            <div style="margin-bottom: 15px">
+              <label>Theme:</label>
+              <div class="theme-selector">
+                <div
+                  class="theme-option theme-default active"
+                  onclick="setTheme('default')"
+                >
+                  Default
+                </div>
+                <div
+                  class="theme-option theme-ocean"
+                  onclick="setTheme('ocean')"
+                >
+                  Ocean
+                </div>
+                <div
+                  class="theme-option theme-forest"
+                  onclick="setTheme('forest')"
+                >
+                  Forest
+                </div>
+                <div
+                  class="theme-option theme-light"
+                  onclick="setTheme('light')"
+                >
+                  Light
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px">
+              <button class="btn" onclick="exportData()">📤 Export</button>
+              <button class="btn" onclick="importData()">📥 Import</button>
+              <input
+                type="file"
+                id="importFile"
+                accept=".json"
+                style="display: none"
+                onchange="handleImport(event)"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notifications" id="notifications"></div>
+
+    <audio id="bellSound" preload="auto">
+      <source
+        src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwAwgLn0zIIABi2GyvHLGAU5gtDwzYIABi2GyvLQH4g5gdvyvIhheoeXo3BVcTOH3PK1ZVBF7uivXjhBsOjLXjhBsOjLXjhBsOjLXjhBsOjLXjhBsOjLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYABjKHyvHLGgU5gtPxzYYA"
+        type="audio/wav"
+      />
+    </audio>
+
+    <iframe
+      id="spotifyPlayer"
+      style="
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+        width: 300px;
+        height: 80px;
+      "
+      src="https://open.spotify.com/embed/playlist/4Zjli1P13J5mmSCD5iKAXK?theme=0"
+      frameborder="0"
+      allowfullscreen=""
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy"
+    ></iframe>
+
+    <script src="script.js"></script>
+  </body>
+</html>
