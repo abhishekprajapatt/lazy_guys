@@ -31,8 +31,8 @@ let whiteNoiseAudio;
 let isSpotifyPlaying = false;
 let spotifyIframeReady = false;
 let currentTrack = {
-    name: "YOUR EYES",
-    artist: "Joey Pecoraro"
+    name: "Star Boy",
+    artist: "The Weeknd"
 };
 let pipWindow = null;
 let notificationSent = { 50: false, 90: false };
@@ -301,7 +301,7 @@ function openPipWindow() {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>PIP Timer</title>
+            <title></title>
             <style>
                 * {
                     margin: 0;
